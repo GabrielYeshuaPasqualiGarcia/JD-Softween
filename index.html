@@ -1,0 +1,127 @@
+<h1>JDUBER</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa do Mercado com Setores</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #008106;
+        }
+        .market-canvas {
+            border: 1px solid #fbff00;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="marketCanvas" class="market-canvas" width="800" height="600"></canvas>
+    <script>
+        function desenharMercado() {
+            const canvas = document.getElementById('marketCanvas');
+            const ctx = canvas.getContext('2d');
+            const largura = canvas.width;
+            const altura = canvas.height;
+            const corredorPrincipalAltura = 80;
+            const corredorLargura = 40;
+
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, largura, altura);
+
+            
+            ctx.fillStyle = '#696969';
+            const centroY = altura / 2 - corredorPrincipalAltura / 2;
+            ctx.fillRect(0, centroY, largura, corredorPrincipalAltura);
+
+            
+            const numCorredores = 4;
+            const espacamento = largura / (numCorredores + 1);
+            
+            for (let i = 1; i <= numCorredores; i++) {
+                const x = i * espacamento;
+                ctx.fillRect(x - corredorLargura / 2, 0, corredorLargura, centroY);
+                ctx.fillRect(x - corredorLargura / 2, centroY + corredorPrincipalAltura, corredorLargura, centroY);
+            }
+
+            
+            const carrinhoAltura = 30;
+            const carrinhoLargura = 20;
+            const carrinhos = [];
+
+            function desenharCarrinho(carrinho) {
+                ctx.fillStyle = carrinho.color;
+                ctx.fillRect(carrinho.x, carrinho.y, carrinhoLargura, carrinhoAltura);
+            }
+
+            
+            const xPrincipal = largura / 2 - carrinhoLargura / 2;
+            const yPrincipal = altura / 2 - corredorPrincipalAltura / 2 + corredorPrincipalAltura / 2 - carrinhoAltura / 2;
+            carrinhos.push({ x: xPrincipal, y: yPrincipal, color: 'green' });
+
+            
+            for (let i = 1; i <= numCorredores; i++) {
+                const x = i * espacamento - corredorLargura / 2;
+                
+                
+                const ySuperior = centroY / 2 - carrinhoAltura / 2;
+                carrinhos.push({ x: x, y: ySuperior, color: 'green' });
+
+                
+                const yInferior = centroY + corredorPrincipalAltura + centroY / 2 - carrinhoAltura / 2;
+                carrinhos.push({ x: x, y: yInferior, color: 'green' });
+            }
+
+            
+            function redesenharMercado() {
+                
+                ctx.clearRect(0, 0, largura, altura);
+                
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, largura, altura);
+
+                
+                ctx.fillStyle = '#696969';
+                ctx.fillRect(0, centroY, largura, corredorPrincipalAltura);
+
+                
+                for (let i = 1; i <= numCorredores; i++) {
+                    const x = i * espacamento;
+                    ctx.fillRect(x - corredorLargura / 2, 0, corredorLargura, centroY);
+                    ctx.fillRect(x - corredorLargura / 2, centroY + corredorPrincipalAltura, corredorLargura, centroY);
+                }
+
+                
+                carrinhos.forEach(desenharCarrinho);
+            }
+
+            
+            canvas.addEventListener('click', (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                for (const carrinho of carrinhos) {
+                    if (x >= carrinho.x && x <= carrinho.x + carrinhoLargura &&
+                        y >= carrinho.y && y <= carrinho.y + carrinhoAltura) {
+                        
+                        carrinho.color = carrinho.color === 'green' ? 'red' : 'green';
+                        redesenharMercado();
+                        break;
+                    }
+                }
+            });
+
+            redesenharMercado();
+        }
+
+        desenharMercado();
+    </script>
+</body>
+</html>
